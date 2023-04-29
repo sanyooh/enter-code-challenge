@@ -80,6 +80,8 @@ function App() {
                 });
             };
             setFileSystemData(addEntriesRecursively(fileSystemData));
+        } else {
+            setFileSystemData(curr => ([...curr, newItem]));
         }
 
     };
@@ -88,7 +90,11 @@ function App() {
         <Box p="20px">
             <>
                 <h2>Enter Code Challenge - Finder</h2>
-                <FileSystem data={fileSystemData} onDeleteEntry={(id) => deleteEntry(fileSystemData, id)} onAddEntry={addEntry} />
+                <FileSystem
+                    data={fileSystemData}
+                    onDeleteEntry={(id) => deleteEntry(fileSystemData, id)}
+                    onAddEntry={addEntry}
+                />
             </>
         </Box>
     );

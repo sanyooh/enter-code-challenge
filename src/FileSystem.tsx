@@ -1,6 +1,7 @@
 import React from "react";
 import {Grid} from "@mui/material";
 import {FileEntry} from "./FileEntry";
+import {AddButton} from "./AddButton";
 
 
 interface File {
@@ -70,6 +71,9 @@ export const FileSystem: React.FC<FileSystemProps> = ({ data, onDeleteEntry, onA
     return (
         <Grid container direction="column" spacing={2} overflow="auto">
             {renderFileSystem(data)}
+            <Grid item>
+                <AddButton onClick={(type: FileSystemEntryType) => onAddEntry(type)} />
+            </Grid>
         </Grid>
     );
 };
