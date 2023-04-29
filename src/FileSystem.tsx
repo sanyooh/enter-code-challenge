@@ -17,22 +17,36 @@ interface Directory {
 
 export type FileSystemEntry = Directory | File;
 
+export type FileSystemEntryType = FileSystemEntry['type'];
+
 interface FileSystemProps {
     data: FileSystemEntry[];
     onDeleteEntry: (id: string) => void;
+    onAddEntry: (type: FileSystemEntryType, parentEntryId?: string) => void;
 }
 
-export const FileSystem: React.FC<FileSystemProps> = ({ data, onDeleteEntry }) => {
+export const FileSystem: React.FC<FileSystemProps> = ({ data, onDeleteEntry, onAddEntry }) => {
     const renderFileSystem = (entries: FileSystemEntry[]) => {
         return entries.map((entry, index) => {
             if (entry.type === 'directory') {
                 return (
                     <Grid key={index} item>
-                        <Grid container direction="row" alignItems="start">
-                            <FileEntry entry={entry} onDelete={() => onDeleteEntry(entry.id)} />
+                        <Grid container direction="row" alignItems="start" wrap="nowrap" width="100%">
+                            <FileEntry
+                                entry={entry}
+                                onDelete={() => onDeleteEntry(entry.id)}
+                                onAdd={(type) => onAddEntry(type, entry.id)}
+                            />
                             {entry.content && (
                                 <Grid item>
-                                    <Grid container direction="column" spacing={2} alignItems="start">{renderFileSystem(entry.content)}</Grid>
+                                    <Grid
+                                        container
+                                        direction="column"
+                                        spacing={2}
+                                        alignItems="start"
+                                    >
+                                        {renderFileSystem(entry.content)}
+                                    </Grid>
                                 </Grid>
                             )}
                         </Grid>
@@ -54,7 +68,7 @@ export const FileSystem: React.FC<FileSystemProps> = ({ data, onDeleteEntry }) =
     };
 
     return (
-        <Grid container direction="column" spacing={2}>
+        <Grid container direction="column" spacing={2} overflow="auto">
             {renderFileSystem(data)}
         </Grid>
     );
