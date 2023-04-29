@@ -1,106 +1,72 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './App.css';
-import {Box, Grid} from "@mui/material";
-
-interface File {
-    type: 'file';
-    name: string;
-}
-interface Directory {
-    type: 'directory';
-    name: string;
-    content?: (Directory | File)[];
-}
-
-type FileSystemEntry = Directory | File;
+import {Box} from "@mui/material";
+import {v4 as uuid} from 'uuid';
+import {FileSystem, FileSystemEntry} from "./FileSystem";
 
 const mockData: FileSystemEntry[] = [
     {
         type: 'directory',
+        id: uuid(),
         name: 'level 1',
         content: [
             {
                 type: 'directory',
+                id: uuid(),
                 name: 'level 2',
                 content: [
                     {
                         type: 'directory',
+                        id: uuid(),
                         name: 'level 3',
                     }
                 ]
             },
             {
                 type: 'file',
+                id: uuid(),
                 name: 'level 2',
             }
         ],
     },
     {
         type: 'directory',
+        id: uuid(),
         name: 'level 1',
     },
     {
         type: 'file',
+        id: uuid(),
         name: 'level 1',
     }
 ];
 
-interface FileSystemProps {
-    data: FileSystemEntry[];
-}
+function App() {
+    const [fileSystemData, setFileSystemData] = useState(mockData);
+    const deleteEntry = (data: FileSystemEntry[], id: string) => {
+        const deleteEntriesRecursively = (entries: FileSystemEntry[]): FileSystemEntry[] => {
+            return entries.filter((entry) => {
+                if (entry.id === id) {
+                    return false;
+                }
+                if (entry.type === 'directory' && entry.content) {
+                    entry.content = deleteEntriesRecursively(entry.content);
+                }
+                return true;
+            });
+        };
 
-
-const FileSystem: React.FC<FileSystemProps> = ({ data }) => {
-    const renderFileSystem = (entries: FileSystemEntry[]) => {
-        return entries.map((entry, index) => {
-            if (entry.type === 'directory') {
-                return (
-                    <Grid key={index} item>
-                        <Grid container direction="row" alignItems="start">
-                            <Box pr="30px">
-                                📁 {entry.name}
-                            </Box>
-                            {entry.content && (
-                                <Grid item>
-                                    <Grid container direction="column" spacing={2} alignItems="start">{renderFileSystem(entry.content)}</Grid>
-                                </Grid>
-                            )}
-                        </Grid>
-                    </Grid>
-                );
-            } else if (entry.type === 'file') {
-                return (
-                    <Grid key={index} item>
-                        <Grid container direction="row" alignItems="start">
-                            <Grid item>
-                                <Box>
-                                    📄 {entry.name}
-                                </Box>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                );
-            }
-            return null;
-        });
-    };
+        setFileSystemData(deleteEntriesRecursively(data));
+    }
 
     return (
-        <Grid container direction="column" spacing={2}>
-            {renderFileSystem(data)}
-        </Grid>
+        <Box p="20px">
+            <>
+                <h2>Enter Code Challenge - Finder</h2>
+                <FileSystem data={fileSystemData} onDeleteEntry={(id) => deleteEntry(fileSystemData, id)} />
+            </>
+        </Box>
     );
-};
-
-function App() {
-  return (
-    <Box p="20px">
-        <>
-            <h2>Enter Code Challenge - Finder</h2>
-            <FileSystem data={mockData} />
-        </>
-    </Box>
-  );
 }
 
 export default App;
